@@ -1,0 +1,212 @@
+
+
+#  1. API Key kya hoti hai?
+
+```js
+const apikey = "a0f48ffb22f4669a5b5e41e2ee5b22de";
+```
+
+* Ye ek **unique key** hoti hai jo tumhe **OpenWeatherMap** deta hai
+* Is se API ko pata chalta hai ke request tum kar rahe ho (authorized user)
+
+---
+
+#  2. HTML elements ko select karna
+
+```js
+const main = document.getElementById("main");
+const form = document.getElementById("form");
+const search = document.getElementById("search");
+```
+
+ Ye **DOM manipulation** hai
+
+* `main` → jahan result show hoga
+* `form` → input wala form
+* `search` → input field
+
+ `document.getElementById()` se tum HTML element ko JS me control kar sakte ho
+
+---
+
+#  3. API URL banana (Dynamic URL)
+
+```js
+const url = (city) =>
+  `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apikey}`;
+```
+
+ Ye function hai jo:
+
+* city ka naam leta hai
+* API URL banata hai
+
+ `${city}` = dynamic value (template string)
+
+Example:
+
+```
+Lahore → https://api.openweathermap.org/...q=Lahore
+```
+
+---
+
+#  4. API se data fetch karna (IMPORTANT)
+
+```js
+async function getWeatherByLocation(city) {
+  const resp = await fetch(url(city), { origin: "cors" });
+  const respData = await resp.json();
+
+  console.log(respData);
+
+  addWeatherToPage(respData);
+}
+```
+
+###  Yahan 3 important cheezein hain:
+
+### 1. `async/await`
+
+* async function → async ka matlab wait kar sakta hai
+* await → jab tak data na aaye, ruk jao
+
+### 2. `fetch()`
+
+* API call karta hai (internet se data lata hai)
+
+### 3. `resp.json()`
+
+* API data JSON format me hota hai
+* isko JS object me convert karta hai
+
+ `console.log()` debugging ke liye use hota hai
+
+---
+
+#  5. Data ko screen par show karna
+
+```js
+function addWeatherToPage(data) {
+  const temp = KtoC(data.main.temp);
+```
+
+ `data.main.temp`:
+
+* API se temperature milta hai (Kelvin me)
+
+---
+
+##  Kelvin → Celsius convert
+
+```js
+function KtoC(K) {
+  return Math.floor(K - 273.15);
+}
+```
+
+ API temperature Kelvin me deta hai
+ Tum use Celsius me convert kar rahe ho
+
+---
+
+##  HTML dynamically banana
+
+```js
+const weather = document.createElement("div");
+weather.classList.add("weather");
+```
+
+ Naya div create kiya
+
+---
+
+```js
+weather.innerHTML = `
+  <h2>
+    <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" />
+    ${temp}°C
+    <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" />
+  </h2>
+  <small>${data.weather[0].main}</small>
+`;
+```
+
+ Yahan:
+
+* icon show ho raha hai 🌤️
+* temperature show ho raha hai
+* weather condition (Clouds, Rain etc.)
+
+ `data.weather[0].icon` → icon code
+ `data.weather[0].main` → weather type
+
+---
+
+##  Purana data remove karna
+
+```js
+main.innerHTML = "";
+main.appendChild(weather);
+```
+
+ Pehle screen clear ki
+ phir naya data add kiya
+
+---
+
+#  6. Form submit event
+
+```js
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  const city = search.value;
+
+  if (city) {
+    getWeatherByLocation(city);
+  }
+});
+```
+
+##  Important:
+
+* `submit` → jab user enter press kare
+* `e.preventDefault()` → page reload hone se rokta hai
+
+ phir:
+
+* input se city li
+* function call ki
+
+---
+
+#  7. CSS kya kar raha hai?
+
+* center layout bana raha hai
+* input ko stylish bana raha hai
+* weather ko center me show kar raha hai
+
+---
+
+#  Overall Flow (Simple)
+
+1. User city likhta hai
+2. Form submit hota hai
+3. API call hoti hai
+4. Data milta hai
+5. Screen par show hota hai
+
+---
+
+#  Important Concepts (jo tumhe yaad rakhne chahiye)
+
+* DOM manipulation
+* API call (`fetch`)
+* async/await
+* JSON data
+* Dynamic HTML (`innerHTML`)
+* Event handling
+
+---
+
